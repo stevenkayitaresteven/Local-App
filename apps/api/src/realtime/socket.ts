@@ -1,7 +1,7 @@
 import { Server as IOServer } from "socket.io";
 import type { Server as HttpServer } from "node:http";
 import { verifyAccessToken } from "../lib/tokens.js";
-import { env } from "../config/env.js";
+import { isOriginAllowed } from "../lib/cors.js";
 import { logger } from "../lib/logger.js";
 import { prisma } from "../lib/prisma.js";
 import { realtime } from "./registry.js";
@@ -13,7 +13,10 @@ interface SocketData {
 
 export function attachRealtime(httpServer: HttpServer): IOServer {
   const io = new IOServer(httpServer, {
-    cors: { origin: env.WEB_ORIGIN, credentials: true },
+    cors: {
+      origin: (origin, cb) => cb(null, isOriginAllowed(origin ?? undefined)),
+      credentials: true,
+    },
     path: "/realtime",
   });
   realtime.attach(io);
