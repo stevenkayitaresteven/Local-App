@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "types": ["node"],
+    // Express types `req.params`/`req.query` as open string records, which makes
+    // `noUncheckedIndexedAccess` produce noise on every route handler. Full `strict`
+    // mode stays on; we relax only this one flag at the HTTP edge.
+    "noUncheckedIndexedAccess": false
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["dist", "node_modules", "tests", "**/*.test.ts"]
+}
