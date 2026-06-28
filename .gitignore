@@ -33,3 +33,16 @@ storage/
 .turbo/
 .tsbuildinfo
 *.tsbuildinfo
+
+# expo / react-native
+.expo/
+apps/mobile/.expo/
+apps/mobile/dist-export/
+dist-export/
+*.hbc
+.expo-shared/
+
+# prisma local dbs / engine cache (downloaded for restricted networks)
+**/_migtest.db*
+**/prisma/prisma/
+apps/api/prisma/*.db

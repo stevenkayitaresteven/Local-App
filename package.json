@@ -7,18 +7,19 @@
   "workspaces": [
     "packages/shared",
     "apps/api",
-    "apps/web"
+    "apps/mobile"
   ],
   "engines": {
     "node": ">=20"
   },
   "scripts": {
-    "build": "npm run build -w @umuturanyi/shared && npm run build -w @umuturanyi/api && npm run build -w @umuturanyi/web",
-    "dev": "concurrently -n api,web -c green,magenta \"npm run dev -w @umuturanyi/api\" \"npm run dev -w @umuturanyi/web\"",
+    "build": "npm run build -w @umuturanyi/shared && npm run build -w @umuturanyi/api",
+    "dev": "concurrently -n api,mobile -c green,magenta \"npm run dev -w @umuturanyi/api\" \"npm run start -w @umuturanyi/mobile\"",
+    "dev:api": "npm run dev -w @umuturanyi/api",
+    "mobile": "npm run start -w @umuturanyi/mobile",
     "db:migrate": "npm run db:migrate -w @umuturanyi/api",
     "db:seed": "npm run db:seed -w @umuturanyi/api",
     "db:reset": "npm run db:reset -w @umuturanyi/api",
-    "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present"
   },

@@ -1,0 +1,68 @@
+# Umuturanyi — local/production-like stack.
+#
+#   docker compose up --build            # API on SQLite (zero extra services)
+#   SEED_ON_START=true docker compose up  # also seed demo data on first boot
+#
+# Postgres + Redis are included for the production topology (opt-in via profiles).
+# To run the API against Postgres, switch the Prisma provider to "postgresql"
+# (see docs/DEPLOYMENT.md) and set DATABASE_URL accordingly, then:
+#   docker compose --profile postgres up --build
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      NODE_ENV: production
+      API_PORT: "4000"
+      DATABASE_URL: "file:/app/apps/api/data/prod.db"
+      WEB_ORIGIN: ${WEB_ORIGIN:-http://localhost:8081}
+      API_PUBLIC_URL: ${API_PUBLIC_URL:-http://localhost:4000}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:?set a strong secret in .env}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:?set a strong secret in .env}
+      SEED_ON_START: ${SEED_ON_START:-false}
+      STORAGE_LOCAL_DIR: "/app/apps/api/uploads"
+    volumes:
+      - api-data:/app/apps/api/data
+      - api-uploads:/app/apps/api/uploads
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:4000/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  postgres:
+    image: postgres:16-alpine
+    profiles: ["postgres"]
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: umuturanyi
+      POSTGRES_PASSWORD: umuturanyi
+      POSTGRES_DB: umuturanyi
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U umuturanyi"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    profiles: ["cache"]
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+volumes:
+  api-data:
+  api-uploads:
+  pg-data:
+  redis-data:

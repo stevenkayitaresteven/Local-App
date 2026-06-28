@@ -1,0 +1,17 @@
+export { formatFrw } from "@umuturanyi/shared";
+
+/** Kinyarwanda relative time, e.g. "imin. 5 ishize", "iminsi 2 ishize". */
+export function timeAgo(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const min = Math.floor(diff / 60_000);
+  if (min < 1) return "nonaha";
+  if (min < 60) return `imin. ${min} ishize`;
+  const hours = Math.floor(min / 60);
+  if (hours < 24) return `amasaha ${hours} ashize`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `iminsi ${days} ishize`;
+  const weeks = Math.floor(days / 7);
+  if (weeks < 5) return `ibyumweru ${weeks} bishize`;
+  const months = Math.floor(days / 30);
+  return `amezi ${months} ashize`;
+}

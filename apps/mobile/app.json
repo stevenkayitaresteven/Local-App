@@ -1,0 +1,36 @@
+{
+  "expo": {
+    "name": "Umuturanyi",
+    "slug": "umuturanyi",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "umuturanyi",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "backgroundColor": "#FFF4E8"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "rw.umuturanyi.app"
+    },
+    "android": {
+      "package": "rw.umuturanyi.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#EF6320"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    },
+    "plugins": ["expo-router", "expo-secure-store"],
+    "experiments": {
+      "typedRoutes": false
+    },
+    "extra": {
+      "apiUrl": "http://localhost:4000"
+    }
+  }
+}
