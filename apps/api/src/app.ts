@@ -6,6 +6,7 @@ import { pinoHttp } from "pino-http";
 import { randomUUID } from "node:crypto";
 import { resolve } from "node:path";
 import { env } from "./config/env.js";
+import { corsOptions } from "./lib/cors.js";
 import { logger } from "./lib/logger.js";
 import { apiRouter } from "./routes.js";
 import { healthRouter } from "./modules/health/health.controller.js";
@@ -28,12 +29,7 @@ export function createApp(): Express {
     }),
   );
 
-  app.use(
-    cors({
-      origin: env.WEB_ORIGIN.split(",").map((o) => o.trim()),
-      credentials: true,
-    }),
-  );
+  app.use(cors(corsOptions));
 
   app.use(
     pinoHttp({

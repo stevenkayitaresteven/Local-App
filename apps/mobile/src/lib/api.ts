@@ -1,4 +1,4 @@
-import { API_V1 } from "./config";
+import { API_URL, API_V1 } from "./config";
 import { secureStorage, TOKEN_KEYS } from "./storage";
 
 export class ApiError extends Error {
@@ -79,11 +79,22 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
   if (body !== undefined) headers["Content-Type"] = "application/json";
   if (auth && accessToken) headers.Authorization = `Bearer ${accessToken}`;
 
-  const res = await fetch(buildUrl(path, query), {
-    method,
-    headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
-  });
+  let res: Response;
+  try {
+    res = await fetch(buildUrl(path, query), {
+      method,
+      headers,
+      body: body !== undefined ? JSON.stringify(body) : undefined,
+    });
+  } catch {
+    // Thrown on a network/CORS failure (the server is unreachable). Surface a clear,
+    // actionable message instead of a generic error.
+    throw new ApiError(
+      0,
+      "network",
+      `Ntibyashobotse kugera kuri seriveri (${API_URL}). Reba ko API ikora.`,
+    );
+  }
 
   if (res.status === 401 && auth && !options._retry) {
     if (await tryRefresh()) {
