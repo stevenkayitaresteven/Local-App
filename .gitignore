@@ -1,0 +1,48 @@
+node_modules/
+dist/
+build/
+coverage/
+*.log
+npm-debug.log*
+
+# env
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# databases
+*.sqlite
+*.sqlite-journal
+*.db
+apps/api/prisma/*.db
+apps/api/prisma/dev.db*
+
+# uploads (local disk storage driver)
+apps/api/uploads/
+storage/
+
+# editor / OS
+.DS_Store
+.idea/
+.vscode/
+*.swp
+
+# build caches
+.vite/
+.turbo/
+.tsbuildinfo
+*.tsbuildinfo
+
+# expo / react-native
+.expo/
+apps/mobile/.expo/
+apps/mobile/dist-export/
+dist-export/
+*.hbc
+.expo-shared/
+
+# prisma local dbs / engine cache (downloaded for restricted networks)
+**/_migtest.db*
+**/prisma/prisma/
+apps/api/prisma/*.db
