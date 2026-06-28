@@ -28,9 +28,6 @@
     "plugins": ["expo-router", "expo-secure-store"],
     "experiments": {
       "typedRoutes": false
-    },
-    "extra": {
-      "apiUrl": "http://localhost:4000"
     }
   }
 }
