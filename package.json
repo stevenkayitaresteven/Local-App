@@ -13,6 +13,8 @@
     "node": ">=20"
   },
   "scripts": {
+    "postinstall": "node scripts/postinstall.mjs",
+    "setup": "node scripts/postinstall.mjs",
     "build": "npm run build -w @umuturanyi/shared && npm run build -w @umuturanyi/api",
     "dev": "concurrently -n api,mobile -c green,magenta \"npm run dev -w @umuturanyi/api\" \"npm run start -w @umuturanyi/mobile\"",
     "dev:api": "npm run dev -w @umuturanyi/api",

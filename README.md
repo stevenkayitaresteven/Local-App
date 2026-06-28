@@ -45,9 +45,9 @@ mobile-money (MTN MoMo / Airtel Money) habits.
 > Requirements: **Node 20+** and npm. No database server needed — dev uses SQLite.
 
 ```bash
-# 1. Install
+# 1. Install — postinstall auto-creates apps/api/.env, builds the shared
+#    package, and generates the Prisma client. No manual env copy needed.
 npm install
-cp .env.example .env            # tweak if you like; defaults work for local dev
 
 # 2. Set up the database (SQLite) and seed realistic demo data
 npm run db:migrate -w @umuturanyi/api    # apply migrations
@@ -59,6 +59,9 @@ npm run dev:api
 # 4. In another terminal, run the mobile app (Expo)
 npm run mobile                  # press i / a / w for iOS, Android, or web
 ```
+
+> Already cloned an earlier copy? `git pull && npm install` re-runs setup.
+> Config lives in `apps/api/.env` (created from `.env.example`); edit it to taste.
 
 **Demo logins** (password `umuturanyi123`): `+250788100001` (Aline, Kimironko),
 `+250788100002` (Bosco), … and admin `+250788000000`.
