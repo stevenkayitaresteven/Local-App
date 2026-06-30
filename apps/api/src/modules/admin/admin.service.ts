@@ -6,17 +6,31 @@ import type { Prisma } from "@prisma/client";
 
 export async function dashboardStats() {
   const since = new Date(Date.now() - 7 * 86_400_000);
-  const [users, activeListings, soldListings, posts, openReports, messages, newUsers, newListings] =
-    await Promise.all([
-      prisma.user.count({ where: { deletedAt: null } }),
-      prisma.listing.count({ where: { status: "active", deletedAt: null } }),
-      prisma.listing.count({ where: { status: "sold" } }),
-      prisma.post.count({ where: { deletedAt: null } }),
-      prisma.report.count({ where: { status: { in: ["open", "reviewing"] } } }),
-      prisma.message.count(),
-      prisma.user.count({ where: { createdAt: { gte: since } } }),
-      prisma.listing.count({ where: { createdAt: { gte: since } } }),
-    ]);
+  const [
+    users,
+    activeListings,
+    soldListings,
+    posts,
+    openReports,
+    messages,
+    openAkaziJobs,
+    openAkaziServices,
+    newUsers,
+    newListings,
+    newAkazi,
+  ] = await Promise.all([
+    prisma.user.count({ where: { deletedAt: null } }),
+    prisma.listing.count({ where: { status: "active", deletedAt: null } }),
+    prisma.listing.count({ where: { status: "sold" } }),
+    prisma.post.count({ where: { deletedAt: null } }),
+    prisma.report.count({ where: { status: { in: ["open", "reviewing"] } } }),
+    prisma.message.count(),
+    prisma.akaziListing.count({ where: { status: "open", kind: "job", deletedAt: null } }),
+    prisma.akaziListing.count({ where: { status: "open", kind: "service", deletedAt: null } }),
+    prisma.user.count({ where: { createdAt: { gte: since } } }),
+    prisma.listing.count({ where: { createdAt: { gte: since } } }),
+    prisma.akaziListing.count({ where: { createdAt: { gte: since }, deletedAt: null } }),
+  ]);
   return {
     users,
     activeListings,
@@ -24,7 +38,9 @@ export async function dashboardStats() {
     posts,
     openReports,
     messages,
-    last7Days: { newUsers, newListings },
+    akaziJobs: openAkaziJobs,
+    akaziServices: openAkaziServices,
+    last7Days: { newUsers, newListings, newAkazi },
   };
 }
 
@@ -78,6 +94,9 @@ async function takedownTarget(type: string, id: string, handlerId: string): Prom
       break;
     case "post":
       await prisma.post.updateMany({ where: { id }, data: { deletedAt: new Date() } });
+      break;
+    case "akazi":
+      await prisma.akaziListing.updateMany({ where: { id }, data: { status: "removed", deletedAt: new Date() } });
       break;
     case "comment":
       await prisma.comment.updateMany({ where: { id }, data: { deletedAt: new Date() } });

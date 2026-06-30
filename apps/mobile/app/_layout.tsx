@@ -27,6 +27,9 @@ export default function RootLayout() {
             <Stack.Screen name="isoko/[id]" options={{ presentation: "card" }} />
             <Stack.Screen name="ubutumwa/[id]" />
             <Stack.Screen name="sell" options={{ presentation: "modal" }} />
+            <Stack.Screen name="akazi/index" />
+            <Stack.Screen name="akazi/[id]" options={{ presentation: "card" }} />
+            <Stack.Screen name="akazi/new" options={{ presentation: "modal" }} />
           </Stack>
         </QueryClientProvider>
       </SafeAreaProvider>

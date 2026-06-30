@@ -1,4 +1,32 @@
-export { formatFrw } from "@umuturanyi/shared";
+import { formatFrw } from "@umuturanyi/shared";
+import type { AkaziPayPeriod } from "@umuturanyi/shared";
+
+export { formatFrw };
+
+const PAY_PERIOD_LABEL: Record<AkaziPayPeriod, string> = {
+  hour: "/isaha",
+  day: "/umunsi",
+  week: "/icyumweru",
+  month: "/ukwezi",
+  fixed: "",
+  negotiable: "",
+};
+
+/** Render an Akazi pay range, e.g. "8,000–12,000 Frw/umunsi" or "Kungurana ibitekerezo". */
+export function formatPay(
+  payMin: number | null,
+  payMax: number | null,
+  payPeriod: AkaziPayPeriod,
+): string {
+  if (payPeriod === "negotiable" || (payMin == null && payMax == null)) {
+    return "Kungurana ibitekerezo";
+  }
+  const suffix = PAY_PERIOD_LABEL[payPeriod];
+  if (payMin != null && payMax != null && payMin !== payMax) {
+    return `${formatFrw(payMin)}–${formatFrw(payMax)}${suffix}`;
+  }
+  return `${formatFrw((payMax ?? payMin) as number)}${suffix}`;
+}
 
 /** Kinyarwanda relative time, e.g. "imin. 5 ishize", "iminsi 2 ishize". */
 export function timeAgo(iso: string): string {

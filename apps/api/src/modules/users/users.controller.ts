@@ -4,6 +4,7 @@ import * as users from "./users.service.js";
 import * as reviews from "../reviews/reviews.service.js";
 import * as reports from "../reports/reports.service.js";
 import * as listings from "../listings/listings.service.js";
+import * as akazi from "../akazi/akazi.service.js";
 import { prisma } from "../../lib/prisma.js";
 import { toAuthUser } from "../../mappers/index.js";
 import { asyncHandler, ok, created } from "../../lib/http.js";
@@ -45,6 +46,14 @@ usersRouter.get(
   attachUser,
   asyncHandler(async (req, res) => {
     ok(res, { listings: await listings.listingsBySeller(req.params.id, req.auth?.userId) });
+  }),
+);
+
+usersRouter.get(
+  "/:id/akazi",
+  attachUser,
+  asyncHandler(async (req, res) => {
+    ok(res, { akazi: await akazi.akaziByPoster(req.params.id, req.auth?.userId) });
   }),
 );
 

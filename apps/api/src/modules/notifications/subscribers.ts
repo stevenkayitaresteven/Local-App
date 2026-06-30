@@ -109,5 +109,47 @@ export function registerSubscribers(): void {
     }),
   );
 
+  events.on(
+    "akazi.applied",
+    safe(async ({ akaziId, applicantId, posterId }) => {
+      const [actor, akazi] = await Promise.all([
+        prisma.user.findUnique({ where: { id: applicantId }, select: { displayName: true } }),
+        prisma.akaziListing.findUnique({ where: { id: akaziId }, select: { title: true } }),
+      ]);
+      await createNotification({
+        userId: posterId,
+        type: "akazi_applied",
+        title: `${actor?.displayName ?? "Umuturanyi"} yiyandikishije ku itangazo ryawe`,
+        body: akazi?.title ?? "",
+        link: `/akazi/${akaziId}`,
+        actorId: applicantId,
+      });
+    }),
+  );
+
+  events.on(
+    "akazi.application_updated",
+    safe(async ({ akaziId, applicantId, posterId, status }) => {
+      // Withdrawals notify the poster; poster decisions notify the applicant.
+      const withdrawn = status === "withdrawn";
+      const recipientId = withdrawn ? posterId : applicantId;
+      const actorId = withdrawn ? applicantId : posterId;
+      const actor = await prisma.user.findUnique({ where: { id: actorId }, select: { displayName: true } });
+      const labels: Record<string, string> = {
+        shortlisted: "yashyize urutonde inyandiko yawe",
+        accepted: "yemeye inyandiko yawe",
+        declined: "yanze inyandiko yawe",
+        withdrawn: "yikuyemo ku itangazo ryawe",
+      };
+      await createNotification({
+        userId: recipientId,
+        type: "akazi_application_update",
+        title: `${actor?.displayName ?? "Umuturanyi"} ${labels[status] ?? "yahinduye inyandiko"}`,
+        link: `/akazi/${akaziId}`,
+        actorId,
+      });
+    }),
+  );
+
   logger.debug("domain event subscribers registered");
 }

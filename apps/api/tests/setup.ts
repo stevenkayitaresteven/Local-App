@@ -29,6 +29,9 @@ async function reset(): Promise<void> {
     "AuditLog",
     "VerificationToken",
     "Session",
+    "AkaziApplication",
+    "AkaziBookmark",
+    "AkaziListing",
     "Listing",
     "User",
   ];

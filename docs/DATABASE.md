@@ -12,6 +12,7 @@ columns — status fields are strings validated at the application edge (see
 |-------|--------|
 | Identity | `User`, `Session` (refresh/device sessions), `VerificationToken` (OTP/reset) |
 | Marketplace | `Listing`, `Image`, `Favorite`, `RecentlyViewed` |
+| Akazi (jobs & services) | `AkaziListing`, `AkaziBookmark`, `AkaziApplication` |
 | Community | `Post`, `Comment`, `PostLike`, `CommentLike` |
 | Messaging | `Conversation`, `ConversationParticipant`, `Message` |
 | Social graph | `Follow`, `Block` |
@@ -24,8 +25,13 @@ columns — status fields are strings validated at the application edge (see
 - **Denormalized counters** (`favoriteCount`, `likeCount`, `commentCount`, `viewCount`,
   per-participant `unreadCount`) are maintained transactionally so list/feed reads stay
   cheap and never aggregate on the hot path.
-- **Soft deletes** (`deletedAt`) on `User`, `Listing`, `Post`, `Comment` preserve history and
-  keep moderation reversible; queries filter them out.
+- **Soft deletes** (`deletedAt`) on `User`, `Listing`, `AkaziListing`, `Post`, `Comment`
+  preserve history and keep moderation reversible; queries filter them out.
+- **Akazi** reuses the marketplace's shape: an `AkaziListing` (job/service, with an optional
+  `payMin..payMax` range over a `payPeriod`) carries denormalized `bookmarkCount` /
+  `applicationCount`; `AkaziBookmark` mirrors `Favorite`, and `AkaziApplication` is unique per
+  `(akazi, applicant)` with a status workflow (`submitted → shortlisted → accepted/declined`,
+  or applicant `withdrawn`). `Image` gained an optional `akaziId` target alongside listing/post.
 - **Cascading rules** are explicit on every relation (`onDelete: Cascade` / `SetNull`) so
   deleting a user or listing leaves no orphans.
 - **Indexes** target the real access patterns: `Listing(status, categorySlug)`,

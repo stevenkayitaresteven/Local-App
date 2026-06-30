@@ -193,6 +193,36 @@ async function main() {
   });
   void ibimina;
 
+  // ── Akazi (local jobs & services) ─────────────────────────────────────────────
+  const akaziData = [
+    { posterId: keza!.id, kind: "job", title: "Dushaka umufasha wo mu bucuruzi", description: "Dushaka umukozi wo gufasha mu iduka ry'imbuto i Kimironko. Amasaha yo mu gitondo, iminsi 5 ku cyumweru. Ukunda abakiriya kandi ukora neza.", categorySlug: "ubucuruzi", employment: "part_time", payPeriod: "month", payMin: 80_000, payMax: 120_000, neighborhoodSlug: "kimironko", viewCount: 84, applicationCount: 0, createdAt: daysAgo(0.3) },
+    { posterId: eric!.id, kind: "service", title: "Nkora isana rya telefoni na mudasobwa", description: "Mfite ubunararibonye bw'imyaka 6 mu gusana telefoni, mudasobwa, na tablet. Ndaza iwawe cyangwa unzanire. Igiciro gishingiye ku kibazo.", categorySlug: "gusana", employment: "flexible", payPeriod: "negotiable", neighborhoodSlug: "kicukiro", viewCount: 152, applicationCount: 0, createdAt: daysAgo(0.6) },
+    { posterId: divine!.id, kind: "service", title: "Isuku y'inzu n'ububiko", description: "Ntanga serivisi z'isuku y'amazu n'ibiro buri munsi cyangwa buri cyumweru. Nkora neza kandi nizerwa.", categorySlug: "isuku", employment: "flexible", payPeriod: "day", payMin: 8_000, payMax: 12_000, neighborhoodSlug: "kacyiru", viewCount: 71, applicationCount: 0, createdAt: daysAgo(1.5) },
+    { posterId: bosco!.id, kind: "service", title: "Gutwara imizigo na moto", description: "Ndatwara imizigo mito na moto mu Kigali hose. Vuba kandi ku giciro gito.", categorySlug: "gutwara", employment: "gig", payPeriod: "fixed", payMin: 2_000, payMax: 5_000, neighborhoodSlug: "remera", isRemote: false, viewCount: 38, applicationCount: 0, createdAt: daysAgo(2) },
+    { posterId: aline!.id, kind: "job", title: "Dushaka umwarimu wigisha abana imibare", description: "Dukeneye umwarimu wigisha abana b'amashuri abanza imibare n'icyongereza, kabiri ku cyumweru nyuma y'amasomo. Ahantu: Kimironko.", categorySlug: "kwigisha", employment: "contract", payPeriod: "hour", payMin: 3_000, payMax: 5_000, neighborhoodSlug: "kimironko", viewCount: 64, applicationCount: 0, createdAt: daysAgo(3) },
+    { posterId: patrick!.id, kind: "service", title: "Ubwubatsi n'isana ry'amazu", description: "Mfite itsinda ry'abubatsi. Dukora kubaka, gusana, no gusiga irangi. Tubasanga mu Gisozi n'ahandi.", categorySlug: "ubwubatsi", employment: "contract", payPeriod: "negotiable", neighborhoodSlug: "gisozi", viewCount: 96, applicationCount: 0, createdAt: daysAgo(4) },
+  ];
+  const akaziPosts = [];
+  for (const a of akaziData) {
+    const p = point[a.neighborhoodSlug]!;
+    akaziPosts.push(await prisma.akaziListing.create({ data: { ...a, lat: p.lat, lng: p.lng, bumpedAt: a.createdAt } }));
+  }
+
+  // A couple of saved posts + one application (so the board feels alive).
+  await prisma.akaziBookmark.createMany({
+    data: [
+      { userId: aline!.id, akaziId: akaziPosts[1]!.id },
+      { userId: bosco!.id, akaziId: akaziPosts[4]!.id },
+    ],
+  });
+  await prisma.akaziListing.update({ where: { id: akaziPosts[1]!.id }, data: { bookmarkCount: 1 } });
+  await prisma.akaziListing.update({ where: { id: akaziPosts[4]!.id }, data: { bookmarkCount: 1 } });
+
+  await prisma.akaziApplication.create({
+    data: { akaziId: akaziPosts[0]!.id, applicantId: patrick!.id, message: "Muraho, nifuza akazi. Mfite ubunararibonye mu bucuruzi imyaka 2.", status: "submitted" },
+  });
+  await prisma.akaziListing.update({ where: { id: akaziPosts[0]!.id }, data: { applicationCount: 1 } });
+
   // ── Notifications ─────────────────────────────────────────────────────────────
   await prisma.notification.createMany({
     data: [
@@ -208,6 +238,7 @@ async function main() {
     users: await prisma.user.count(),
     listings: await prisma.listing.count(),
     posts: await prisma.post.count(),
+    akazi: await prisma.akaziListing.count(),
     ibimina: await prisma.ibimina.count(),
   };
   console.log("✅ Seed complete:", counts);

@@ -67,6 +67,9 @@ model User {
   payments          Payment[]
   auditLogs         AuditLog[]
   searches          SearchQuery[]
+  akaziPosts        AkaziListing[]       @relation("AkaziPoster")
+  akaziBookmarks    AkaziBookmark[]
+  akaziApplications AkaziApplication[]
 
   @@index([neighborhoodSlug])
   @@index([agaciro])
@@ -114,6 +117,8 @@ model Image {
   listing   Listing? @relation(fields: [listingId], references: [id], onDelete: SetNull)
   postId    String?
   post      Post?    @relation(fields: [postId], references: [id], onDelete: SetNull)
+  akaziId   String?
+  akazi     AkaziListing? @relation(fields: [akaziId], references: [id], onDelete: SetNull)
   position  Int      @default(0)
   createdAt DateTime @default(now())
 
@@ -121,6 +126,7 @@ model Image {
 
   @@index([listingId])
   @@index([postId])
+  @@index([akaziId])
 }
 
 model Listing {
@@ -182,6 +188,74 @@ model RecentlyViewed {
 
   @@unique([userId, listingId])
   @@index([userId, viewedAt])
+}
+
+// ── Akazi: local jobs & services board ──────────────────────────────────────
+// A neighbor either posts a job opening (kind="job") or offers a service
+// (kind="service"). Pay is expressed as an optional range (Frw) over a period.
+model AkaziListing {
+  id               String    @id @default(cuid())
+  posterId         String
+  poster           User      @relation("AkaziPoster", fields: [posterId], references: [id], onDelete: Cascade)
+  kind             String    @default("job") // job | service
+  title            String
+  description      String    @default("")
+  categorySlug     String
+  employment       String    @default("flexible")
+  isRemote         Boolean   @default(false)
+  payPeriod        String    @default("negotiable")
+  payMin           Int?
+  payMax           Int?
+  status           String    @default("open")
+  neighborhoodSlug String
+  lat              Float?
+  lng              Float?
+  viewCount        Int       @default(0)
+  bookmarkCount    Int       @default(0)
+  applicationCount Int       @default(0)
+  bumpedAt         DateTime  @default(now())
+  closedAt         DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  deletedAt        DateTime?
+
+  images       Image[]
+  bookmarks    AkaziBookmark[]
+  applications AkaziApplication[]
+
+  @@index([status, kind])
+  @@index([categorySlug])
+  @@index([neighborhoodSlug])
+  @@index([posterId])
+  @@index([bumpedAt])
+}
+
+model AkaziBookmark {
+  id        String       @id @default(cuid())
+  userId    String
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  akaziId   String
+  akazi     AkaziListing @relation(fields: [akaziId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+
+  @@unique([userId, akaziId])
+  @@index([akaziId])
+}
+
+model AkaziApplication {
+  id          String       @id @default(cuid())
+  akaziId     String
+  akazi       AkaziListing @relation(fields: [akaziId], references: [id], onDelete: Cascade)
+  applicantId String
+  applicant   User         @relation(fields: [applicantId], references: [id], onDelete: Cascade)
+  message     String       @default("")
+  status      String       @default("submitted")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@unique([akaziId, applicantId])
+  @@index([akaziId, status])
+  @@index([applicantId, createdAt])
 }
 
 model Conversation {

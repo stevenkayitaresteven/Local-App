@@ -42,3 +42,35 @@ export const COMMUNITY_TOPICS = [
 ] as const;
 
 export const COMMUNITY_TOPIC_SLUGS = COMMUNITY_TOPICS.map((t) => t.slug);
+
+/**
+ * Akazi (local jobs & services) sub-taxonomy. The marketplace "akazi" vertical
+ * routes here for its own browse experience: gigs, trades, and home help that
+ * neighbors hire each other for. Slugs are stable; `rw`/`en` are display labels.
+ */
+export interface AkaziCategoryDef {
+  slug: string;
+  rw: string;
+  en: string;
+  icon: string;
+}
+
+export const AKAZI_CATEGORIES: AkaziCategoryDef[] = [
+  { slug: "kwigisha", rw: "Kwigisha", en: "Tutoring", icon: "📚" },
+  { slug: "gusana", rw: "Gusana", en: "Repairs", icon: "🔧" },
+  { slug: "isuku", rw: "Isuku", en: "Cleaning", icon: "🧹" },
+  { slug: "gutwara", rw: "Gutwara", en: "Delivery", icon: "🛵" },
+  { slug: "kwimura", rw: "Kwimura", en: "Moving", icon: "📦" },
+  { slug: "ubwubatsi", rw: "Ubwubatsi", en: "Construction", icon: "🧱" },
+  { slug: "umwuga", rw: "Imyuga yo hanze", en: "Freelance", icon: "💻" },
+  { slug: "amatungo", rw: "Serivisi z'amatungo", en: "Pet services", icon: "🐾" },
+  { slug: "murugo", rw: "Serivisi zo mu rugo", en: "Home services", icon: "🏡" },
+  { slug: "ubucuruzi", rw: "Ubucuruzi n'aho bacururiza", en: "Retail & hospitality", icon: "🛍️" },
+  { slug: "ibindi-akazi", rw: "Ibindi", en: "Other", icon: "🧰" },
+];
+
+export const AKAZI_CATEGORY_SLUGS = AKAZI_CATEGORIES.map((c) => c.slug);
+
+export function akaziCategoryBySlug(slug: string): AkaziCategoryDef | undefined {
+  return AKAZI_CATEGORIES.find((c) => c.slug === slug);
+}

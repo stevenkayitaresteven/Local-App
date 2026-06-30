@@ -30,6 +30,8 @@ async function targetExists(type: string, id: string): Promise<boolean> {
       return Boolean(await prisma.post.findUnique({ where: { id }, select: { id: true } }));
     case "comment":
       return Boolean(await prisma.comment.findUnique({ where: { id }, select: { id: true } }));
+    case "akazi":
+      return Boolean(await prisma.akaziListing.findUnique({ where: { id }, select: { id: true } }));
     case "message":
       return Boolean(await prisma.message.findUnique({ where: { id }, select: { id: true } }));
     case "user":

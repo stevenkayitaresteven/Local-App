@@ -16,6 +16,8 @@ export interface DomainEvents {
   "user.followed": { followerId: string; followingId: string };
   "review.created": { reviewId: string; subjectId: string; authorId: string; rating: number };
   "report.created": { reportId: string; targetType: string; targetId: string };
+  "akazi.applied": { akaziId: string; applicationId: string; applicantId: string; posterId: string };
+  "akazi.application_updated": { akaziId: string; applicationId: string; applicantId: string; posterId: string; status: string };
 }
 
 type Handler<K extends keyof DomainEvents> = (payload: DomainEvents[K]) => void | Promise<void>;

@@ -1,10 +1,13 @@
 import {
   categoryBySlug,
+  akaziCategoryBySlug,
   neighborhoodBySlug,
   tierForScore,
   CATEGORIES,
   type PublicUser,
   type ListingDto,
+  type AkaziDto,
+  type AkaziApplicationDto,
   type PostDto,
   type CommentDto,
   type ImageDto,
@@ -17,6 +20,8 @@ import {
 import type {
   User,
   Listing,
+  AkaziListing,
+  AkaziApplication,
   Image,
   Post,
   Comment,
@@ -89,6 +94,64 @@ export function toListingDto(
     distanceKm: opts.distanceKm ?? null,
     createdAt: listing.createdAt.toISOString(),
     bumpedAt: listing.bumpedAt.toISOString(),
+  };
+}
+
+const FALLBACK_AKAZI_CATEGORY = { slug: "ibindi-akazi", rw: "Ibindi", en: "Other", icon: "🧰" };
+
+export function toAkaziDto(
+  akazi: AkaziListing & { poster: User; images: Image[] },
+  opts: { isBookmarked?: boolean; myApplicationStatus?: AkaziDto["myApplicationStatus"]; distanceKm?: number | null } = {},
+): AkaziDto {
+  const cat = akaziCategoryBySlug(akazi.categorySlug) ?? FALLBACK_AKAZI_CATEGORY;
+  const n = neighborhoodBySlug(akazi.neighborhoodSlug);
+  return {
+    id: akazi.id,
+    kind: akazi.kind as AkaziDto["kind"],
+    title: akazi.title,
+    description: akazi.description,
+    category: { slug: cat.slug, rw: cat.rw, en: cat.en, icon: cat.icon },
+    employment: akazi.employment as AkaziDto["employment"],
+    isRemote: akazi.isRemote,
+    payPeriod: akazi.payPeriod as AkaziDto["payPeriod"],
+    payMin: akazi.payMin,
+    payMax: akazi.payMax,
+    status: akazi.status as AkaziDto["status"],
+    neighborhood: n
+      ? { slug: n.slug, name: n.name, district: n.district }
+      : { slug: akazi.neighborhoodSlug, name: akazi.neighborhoodSlug, district: "" },
+    images: [...akazi.images].sort((a, b) => a.position - b.position).map(toImageDto),
+    poster: toPublicUser(akazi.poster),
+    viewCount: akazi.viewCount,
+    bookmarkCount: akazi.bookmarkCount,
+    applicationCount: akazi.applicationCount,
+    isBookmarked: opts.isBookmarked ?? false,
+    myApplicationStatus: opts.myApplicationStatus ?? null,
+    distanceKm: opts.distanceKm ?? null,
+    createdAt: akazi.createdAt.toISOString(),
+    bumpedAt: akazi.bumpedAt.toISOString(),
+  };
+}
+
+export function toAkaziApplicationDto(
+  app: AkaziApplication & { applicant: User; akazi?: AkaziListing | null },
+): AkaziApplicationDto {
+  return {
+    id: app.id,
+    akaziId: app.akaziId,
+    message: app.message,
+    status: app.status as AkaziApplicationDto["status"],
+    applicant: toPublicUser(app.applicant),
+    akazi: app.akazi
+      ? {
+          id: app.akazi.id,
+          kind: app.akazi.kind as AkaziDto["kind"],
+          title: app.akazi.title,
+          status: app.akazi.status as AkaziDto["status"],
+        }
+      : null,
+    createdAt: app.createdAt.toISOString(),
+    updatedAt: app.updatedAt.toISOString(),
   };
 }
 

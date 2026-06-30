@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CATEGORY_SLUGS } from "./categories.js";
+import { CATEGORY_SLUGS, AKAZI_CATEGORY_SLUGS } from "./categories.js";
 import { NEIGHBORHOOD_SLUGS } from "./locations.js";
 import {
   COMMUNITY_TOPIC_SLUGS,
@@ -10,6 +10,12 @@ import {
   REPORT_TARGET,
   SORT_OPTIONS,
   PAYMENT_PROVIDERS,
+  AKAZI_KIND,
+  AKAZI_EMPLOYMENT,
+  AKAZI_PAY_PERIOD,
+  AKAZI_STATUS,
+  AKAZI_SORT,
+  AKAZI_APPLICATION_STATUS,
 } from "./enums.js";
 
 /** Rwandan phone numbers: +2507XXXXXXXX or 07XXXXXXXX. */
@@ -81,6 +87,76 @@ export const listingQuerySchema = z.object({
   limit: z.coerce.number().int().min(1).max(50).default(20),
 });
 export type ListingQuery = z.infer<typeof listingQuerySchema>;
+
+// ── Akazi (local jobs & services) ────────────────────────────────────────────
+const akaziPayPeriodSchema = z.enum(AKAZI_PAY_PERIOD);
+
+export const createAkaziSchema = z
+  .object({
+    kind: z.enum(AKAZI_KIND),
+    title: z.string().trim().min(3).max(100),
+    description: z.string().trim().min(10).max(4000),
+    categorySlug: z.enum(AKAZI_CATEGORY_SLUGS as [string, ...string[]]),
+    employment: z.enum(AKAZI_EMPLOYMENT).default("flexible"),
+    isRemote: z.boolean().default(false),
+    payPeriod: akaziPayPeriodSchema.default("negotiable"),
+    payMin: priceSchema.optional(),
+    payMax: priceSchema.optional(),
+    neighborhoodSlug: z.enum(NEIGHBORHOOD_SLUGS as [string, ...string[]]),
+    imageIds: z.array(z.string().cuid()).max(6).default([]),
+  })
+  .refine((v) => v.payPeriod === "negotiable" || v.payMin !== undefined || v.payMax !== undefined, {
+    message: "Tanga igiciro cyangwa uhitemo 'kungurana ibitekerezo'",
+    path: ["payMin"],
+  })
+  .refine((v) => v.payMin === undefined || v.payMax === undefined || v.payMax >= v.payMin, {
+    message: "Igiciro cyo hejuru kigomba kuruta cyangwa kungana n'icyo hasi",
+    path: ["payMax"],
+  });
+export type CreateAkaziInput = z.infer<typeof createAkaziSchema>;
+
+export const updateAkaziSchema = z
+  .object({
+    title: z.string().trim().min(3).max(100).optional(),
+    description: z.string().trim().min(10).max(4000).optional(),
+    categorySlug: z.enum(AKAZI_CATEGORY_SLUGS as [string, ...string[]]).optional(),
+    employment: z.enum(AKAZI_EMPLOYMENT).optional(),
+    isRemote: z.boolean().optional(),
+    payPeriod: akaziPayPeriodSchema.optional(),
+    payMin: priceSchema.optional().nullable(),
+    payMax: priceSchema.optional().nullable(),
+    neighborhoodSlug: z.enum(NEIGHBORHOOD_SLUGS as [string, ...string[]]).optional(),
+    imageIds: z.array(z.string().cuid()).max(6).optional(),
+    status: z.enum(AKAZI_STATUS).optional(),
+  })
+  .refine(
+    (v) => v.payMin == null || v.payMax == null || v.payMax >= v.payMin,
+    { message: "Igiciro cyo hejuru kigomba kuruta cyangwa kungana n'icyo hasi", path: ["payMax"] },
+  );
+export type UpdateAkaziInput = z.infer<typeof updateAkaziSchema>;
+
+export const akaziQuerySchema = z.object({
+  q: z.string().trim().max(100).optional(),
+  kind: z.enum(AKAZI_KIND).optional(),
+  category: z.enum(AKAZI_CATEGORY_SLUGS as [string, ...string[]]).optional(),
+  employment: z.enum(AKAZI_EMPLOYMENT).optional(),
+  neighborhood: z.enum(NEIGHBORHOOD_SLUGS as [string, ...string[]]).optional(),
+  remoteOnly: z.coerce.boolean().optional(),
+  maxDistanceKm: z.coerce.number().min(0).max(500).optional(),
+  sort: z.enum(AKAZI_SORT).default("recent"),
+  cursor: z.string().optional(),
+  limit: z.coerce.number().int().min(1).max(50).default(20),
+});
+export type AkaziQuery = z.infer<typeof akaziQuerySchema>;
+
+export const applyAkaziSchema = z.object({
+  message: z.string().trim().min(1).max(1000),
+});
+export type ApplyAkaziInput = z.infer<typeof applyAkaziSchema>;
+
+export const akaziApplicationStatusSchema = z.object({
+  status: z.enum(AKAZI_APPLICATION_STATUS),
+});
 
 export const createPostSchema = z.object({
   body: z.string().trim().min(1).max(2000),

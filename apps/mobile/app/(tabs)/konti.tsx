@@ -2,6 +2,7 @@ import React from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { TRUST_TIER_LABEL, tierForScore } from "@umuturanyi/shared";
 import { useAuth } from "@/store/auth";
 import { Avatar, Badge } from "@/components/ui";
@@ -57,6 +58,7 @@ export default function Konti() {
         <View style={styles.menu}>
           <MenuRow icon="pricetag-outline" label="Ibyo ngurisha" />
           <MenuRow icon="heart-outline" label="Ibyo nkunze" />
+          <MenuRow icon="briefcase-outline" label="Akazi & Serivisi" onPress={() => router.push("/akazi")} />
           <MenuRow icon="wallet-outline" label="Umuturanyi Pay · Ibimina" />
           <MenuRow icon="time-outline" label="Ibyo narebye" />
           <MenuRow icon="shield-checkmark-outline" label="Umutekano n'ibanga" />
@@ -83,9 +85,9 @@ function Stat({ value, label, icon }: { value: string | number; label: string; i
   );
 }
 
-function MenuRow({ icon, label }: { icon: keyof typeof Ionicons.glyphMap; label: string }) {
+function MenuRow({ icon, label, onPress }: { icon: keyof typeof Ionicons.glyphMap; label: string; onPress?: () => void }) {
   return (
-    <Pressable style={({ pressed }) => [styles.menuRow, pressed && { backgroundColor: palette.surfaceMuted }]}>
+    <Pressable onPress={onPress} style={({ pressed }) => [styles.menuRow, pressed && { backgroundColor: palette.surfaceMuted }]}>
       <Ionicons name={icon} size={20} color={palette.textSecondary} />
       <Text style={styles.menuLabel}>{label}</Text>
       <Ionicons name="chevron-forward" size={18} color={palette.textFaint} />
