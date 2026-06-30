@@ -14,6 +14,9 @@ COPY apps/api/package.json ./apps/api/
 RUN npm ci --ignore-scripts
 
 # Build the shared package, generate the Prisma client, compile the API.
+# The workspace tsconfigs extend the repo-root tsconfig.base.json, so it must be
+# present for `tsc` to resolve compiler options.
+COPY tsconfig.base.json ./
 COPY packages/shared ./packages/shared
 COPY apps/api ./apps/api
 RUN npm run build -w @umuturanyi/shared \
