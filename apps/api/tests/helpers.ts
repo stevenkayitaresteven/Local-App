@@ -49,3 +49,23 @@ export async function createListing(token: string, overrides: Record<string, unk
   if (res.status !== 201) throw new Error(`createListing failed: ${res.status} ${JSON.stringify(res.body)}`);
   return res.body.listing;
 }
+
+export async function createAkazi(token: string, overrides: Record<string, unknown> = {}) {
+  const res = await api()
+    .post("/api/v1/akazi")
+    .set(auth(token))
+    .send({
+      kind: "service",
+      title: "Test cleaning service",
+      description: "Reliable home cleaning, every week.",
+      categorySlug: "isuku",
+      employment: "flexible",
+      payPeriod: "day",
+      payMin: 8000,
+      payMax: 12000,
+      neighborhoodSlug: "kimironko",
+      ...overrides,
+    });
+  if (res.status !== 201) throw new Error(`createAkazi failed: ${res.status} ${JSON.stringify(res.body)}`);
+  return res.body.akazi;
+}

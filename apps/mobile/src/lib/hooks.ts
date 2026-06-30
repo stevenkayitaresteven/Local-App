@@ -1,6 +1,8 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   ListingDto,
+  AkaziDto,
+  AkaziApplicationDto,
   PostDto,
   CommentDto,
   ConversationDto,
@@ -8,8 +10,16 @@ import type {
   NotificationDto,
   Paginated,
   ListingQuery,
+  AkaziQuery,
 } from "@umuturanyi/shared";
 import { api } from "./api";
+
+interface AkaziCategory {
+  slug: string;
+  rw: string;
+  en: string;
+  icon: string;
+}
 
 // ── Catalog ───────────────────────────────────────────────────────────────────
 export function useCategories() {
@@ -67,6 +77,89 @@ export function useFavorites() {
   return useQuery({
     queryKey: ["favorites"],
     queryFn: () => api.get<{ listings: ListingDto[] }>("/me/favorites"),
+  });
+}
+
+// ── Akazi (local jobs & services) ───────────────────────────────────────────────
+type AkaziFilters = Partial<Pick<AkaziQuery, "q" | "kind" | "category" | "employment" | "neighborhood" | "remoteOnly" | "sort">>;
+
+export function useAkaziCategories() {
+  return useQuery({
+    queryKey: ["akazi-categories"],
+    queryFn: () => api.get<{ categories: AkaziCategory[] }>("/akazi-categories", undefined, false),
+    staleTime: Infinity,
+  });
+}
+
+export function useAkaziBoard(filters: AkaziFilters) {
+  return useInfiniteQuery({
+    queryKey: ["akazi", filters],
+    initialPageParam: undefined as string | undefined,
+    queryFn: ({ pageParam }) =>
+      api.get<Paginated<AkaziDto>>("/akazi", { ...filters, cursor: pageParam, limit: 20 }, false),
+    getNextPageParam: (last) => last.nextCursor ?? undefined,
+  });
+}
+
+export function useAkazi(id: string) {
+  return useQuery({
+    queryKey: ["akazi-post", id],
+    queryFn: () => api.get<{ akazi: AkaziDto }>(`/akazi/${id}`),
+    enabled: Boolean(id),
+  });
+}
+
+export function useToggleAkaziBookmark() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, bookmarked }: { id: string; bookmarked: boolean }) =>
+      bookmarked
+        ? api.del<{ bookmarkCount: number }>(`/akazi/${id}/bookmark`)
+        : api.put<{ bookmarkCount: number }>(`/akazi/${id}/bookmark`),
+    onSuccess: (_d, vars) => {
+      void qc.invalidateQueries({ queryKey: ["akazi"] });
+      void qc.invalidateQueries({ queryKey: ["akazi-post", vars.id] });
+      void qc.invalidateQueries({ queryKey: ["akazi-bookmarks"] });
+    },
+  });
+}
+
+export function useApplyToAkazi() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, message }: { id: string; message: string }) =>
+      api.post<{ application: AkaziApplicationDto }>(`/akazi/${id}/apply`, { message }),
+    onSuccess: (_d, vars) => {
+      void qc.invalidateQueries({ queryKey: ["akazi-post", vars.id] });
+      void qc.invalidateQueries({ queryKey: ["akazi-applications-mine"] });
+    },
+  });
+}
+
+export function useMyAkaziApplications() {
+  return useQuery({
+    queryKey: ["akazi-applications-mine"],
+    queryFn: () => api.get<{ applications: AkaziApplicationDto[] }>("/akazi/applications/mine"),
+  });
+}
+
+export function useAkaziApplications(id: string, enabled: boolean) {
+  return useQuery({
+    queryKey: ["akazi-applications", id],
+    queryFn: () => api.get<{ applications: AkaziApplicationDto[] }>(`/akazi/${id}/applications`),
+    enabled: Boolean(id) && enabled,
+  });
+}
+
+export function useSetAkaziApplicationStatus() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ applicationId, status }: { applicationId: string; status: AkaziApplicationDto["status"] }) =>
+      api.post<{ application: AkaziApplicationDto }>(`/akazi/applications/${applicationId}/status`, { status }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["akazi-applications"] });
+      void qc.invalidateQueries({ queryKey: ["akazi-applications-mine"] });
+    },
   });
 }
 

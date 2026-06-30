@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { CATEGORIES, COMMUNITY_TOPICS, NEIGHBORHOODS, GLOSSARY } from "@umuturanyi/shared";
+import { CATEGORIES, AKAZI_CATEGORIES, COMMUNITY_TOPICS, NEIGHBORHOODS, GLOSSARY } from "@umuturanyi/shared";
 import { ok } from "../../lib/http.js";
 
 /**
@@ -9,6 +9,7 @@ import { ok } from "../../lib/http.js";
 export const catalogRouter = Router();
 
 catalogRouter.get("/categories", (_req, res) => ok(res, { categories: CATEGORIES }));
+catalogRouter.get("/akazi-categories", (_req, res) => ok(res, { categories: AKAZI_CATEGORIES }));
 catalogRouter.get("/topics", (_req, res) => ok(res, { topics: COMMUNITY_TOPICS }));
 catalogRouter.get("/neighborhoods", (_req, res) => ok(res, { neighborhoods: NEIGHBORHOODS }));
 catalogRouter.get("/glossary", (_req, res) => ok(res, { glossary: GLOSSARY }));

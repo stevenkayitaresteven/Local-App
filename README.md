@@ -30,6 +30,7 @@ mobile-money (MTN MoMo / Airtel Money) habits.
 | Area | Highlights |
 |------|-----------|
 | 🛒 Marketplace (Isoko) | Listings with images, categories, conditions; filter, sort, keyset pagination, **distance ("nearby") ranking** |
+| 🛠️ Akazi (jobs & services) | A neighborhood board for local **jobs & services** — post, browse (kind/category/distance/pay), bookmark, and apply, with an applicant inbox for posters |
 | 👥 Community (Umuryango) | Neighborhood feed: posts, comments, replies, likes, topics |
 | 💬 Messaging (Ubutumwa) | Realtime chat — presence, typing, read receipts, unread counters |
 | 🤝 Trust (Agaciro) | Transparent, explainable 0–100 reputation score with a "why" breakdown |
@@ -74,7 +75,7 @@ Health check: `curl http://localhost:4000/healthz` · API root: `http://localhos
 
 ```
 ✓ packages/shared   7 unit tests  (trust score, formatting, geo)
-✓ apps/api         27 integration tests  (auth, listings, favorites,
+✓ apps/api         38 integration tests  (auth, listings, akazi, favorites,
                       community, messaging, reviews/trust, admin, wallet)
 ✓ apps/mobile      typechecks + bundles to Hermes bytecode via Metro
 ```

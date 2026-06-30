@@ -43,6 +43,30 @@ Unversioned operational endpoints: `GET /healthz`, `GET /readyz`, `GET /metrics`
 | DELETE | `/:id` | ✔ owner/staff | soft delete |
 | PUT/DELETE | `/:id/favorite` | ✔ | add / remove favorite |
 
+## Akazi (local jobs & services) — `/akazi`
+
+A neighborhood board where members post **jobs** (hiring) or **services** (offering work),
+apply to each other's posts, and save posts they like.
+
+| Method | Path | Auth | Notes |
+|--------|------|------|-------|
+| GET | `/` | optional | filters: `q, kind=job\|service, category, employment, neighborhood, remoteOnly, maxDistanceKm`; `sort=recent\|nearby\|pay_high\|popular`; `cursor, limit` |
+| POST | `/` | ✔ | create a post (`{ kind, title, description, categorySlug, employment?, isRemote?, payPeriod?, payMin?, payMax?, neighborhoodSlug, imageIds? }`) |
+| GET | `/bookmarks` | ✔ | the caller's saved posts |
+| GET | `/applications/mine` | ✔ | the caller's own applications (with post summaries) |
+| POST | `/applications/:id/status` | ✔ | `{ status }` — poster: `shortlisted\|accepted\|declined` · applicant: `withdrawn` |
+| GET | `/:id` | optional | detail (records a view) |
+| PATCH | `/:id` | ✔ owner | update |
+| POST | `/:id/status` | ✔ owner | `{ status: open\|filled\|closed }` |
+| POST | `/:id/bump` | ✔ owner | refresh `bumpedAt` |
+| DELETE | `/:id` | ✔ owner/staff | soft delete |
+| PUT/DELETE | `/:id/bookmark` | ✔ | save / unsave |
+| POST | `/:id/apply` | ✔ | `{ message }` (one per user; notifies the poster) |
+| GET | `/:id/applications` | ✔ owner/staff | applicants for a post |
+
+Pay is an optional range (`payMin`/`payMax`, whole Frw) over a `payPeriod`
+(`hour\|day\|week\|month\|fixed\|negotiable`); a `negotiable` period clears the figures.
+
 ## Community — `/community`
 
 `GET /posts` (feed: `neighborhood, topic, sort, cursor`), `POST /posts`, `GET /posts/:id`,
@@ -62,7 +86,7 @@ Realtime (Socket.IO, path `/realtime`, auth via handshake token): emit
 ## Users — `/users`
 
 `GET /me`, `PATCH /me`, `GET /:id` (profile + Agaciro breakdown), `GET /:id/listings`,
-`GET /:id/reviews`, `PUT|DELETE /:id/follow`, `PUT|DELETE /:id/block`,
+`GET /:id/akazi`, `GET /:id/reviews`, `PUT|DELETE /:id/follow`, `PUT|DELETE /:id/block`,
 `POST /reviews` (`{ subjectId, rating, comment, listingId? }`),
 `POST /reports` (`{ targetType, targetId, reason, detail? }`).
 
@@ -90,7 +114,7 @@ Realtime (Socket.IO, path `/realtime`, auth via handshake token): emit
 
 ## Catalog (reference data)
 
-`GET /categories`, `GET /topics`, `GET /neighborhoods`, `GET /glossary`.
+`GET /categories`, `GET /akazi-categories`, `GET /topics`, `GET /neighborhoods`, `GET /glossary`.
 
 ## Uploads — `/uploads` _(auth)_
 

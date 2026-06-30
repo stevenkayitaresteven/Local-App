@@ -66,11 +66,23 @@ export default function Home() {
         refreshing={isRefetching}
         onRefresh={refetch}
         ListHeaderComponent={
-          <View style={styles.sortRow}>
-            <SortPill label="Vuba aha" value="recent" active={sort} onPress={setSort} />
-            <SortPill label="Hafi yawe" value="nearby" active={sort} onPress={setSort} />
-            <SortPill label="Bikunzwe" value="popular" active={sort} onPress={setSort} />
-            <SortPill label="Igiciro" value="price_asc" active={sort} onPress={setSort} />
+          <View>
+            <Pressable style={styles.akaziBanner} onPress={() => router.push("/akazi")}>
+              <View style={styles.akaziIcon}>
+                <Text style={{ fontSize: 22 }}>🛠️</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.akaziTitle}>Akazi & Serivisi</Text>
+                <Text style={styles.akaziSub}>Shaka akazi cyangwa utange serivisi mu mudugudu</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={palette.orange} />
+            </Pressable>
+            <View style={styles.sortRow}>
+              <SortPill label="Vuba aha" value="recent" active={sort} onPress={setSort} />
+              <SortPill label="Hafi yawe" value="nearby" active={sort} onPress={setSort} />
+              <SortPill label="Bikunzwe" value="popular" active={sort} onPress={setSort} />
+              <SortPill label="Igiciro" value="price_asc" active={sort} onPress={setSort} />
+            </View>
           </View>
         }
         ListEmptyComponent={
@@ -127,6 +139,25 @@ const styles = StyleSheet.create({
   locationName: { fontWeight: "800", fontSize: 21, color: palette.ink },
   headerActions: { flexDirection: "row", gap: spacing.lg },
   filterRow: { paddingBottom: spacing.md },
+  akaziBanner: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    backgroundColor: palette.orangeSoft,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    marginTop: spacing.md,
+  },
+  akaziIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: radius.md,
+    backgroundColor: palette.white,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  akaziTitle: { fontWeight: "800", fontSize: 15, color: palette.ink },
+  akaziSub: { fontSize: 12, color: palette.orangeDark, marginTop: 2, fontWeight: "500" },
   sortRow: { flexDirection: "row", gap: spacing.sm, paddingVertical: spacing.md },
   sortPill: { paddingHorizontal: 13, paddingVertical: 7, borderRadius: radius.xl, backgroundColor: palette.surfaceMuted },
   sortText: { fontWeight: "600", fontSize: 12.5, color: palette.textSecondary },

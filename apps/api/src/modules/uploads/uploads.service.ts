@@ -45,7 +45,7 @@ export async function uploadImage(ownerId: string, file: { buffer: Buffer; mimet
 export async function attachImages(
   imageIds: string[],
   ownerId: string,
-  target: { listingId?: string; postId?: string },
+  target: { listingId?: string; postId?: string; akaziId?: string },
 ): Promise<void> {
   if (!imageIds.length) return;
   const images = await prisma.image.findMany({ where: { id: { in: imageIds }, ownerId } });
@@ -56,7 +56,12 @@ export async function attachImages(
       .map((id, index) =>
         prisma.image.update({
           where: { id },
-          data: { listingId: target.listingId ?? null, postId: target.postId ?? null, position: index },
+          data: {
+            listingId: target.listingId ?? null,
+            postId: target.postId ?? null,
+            akaziId: target.akaziId ?? null,
+            position: index,
+          },
         }),
       ),
   );

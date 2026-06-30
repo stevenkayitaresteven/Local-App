@@ -1,4 +1,14 @@
-import type { ListingStatus, ListingCondition, UserRole, NotificationType } from "./enums.js";
+import type {
+  ListingStatus,
+  ListingCondition,
+  UserRole,
+  NotificationType,
+  AkaziKind,
+  AkaziEmployment,
+  AkaziPayPeriod,
+  AkaziStatus,
+  AkaziApplicationStatus,
+} from "./enums.js";
 import type { TrustTier } from "./trust.js";
 
 /**
@@ -53,6 +63,44 @@ export interface ListingDto {
   distanceKm: number | null;
   createdAt: string;
   bumpedAt: string;
+}
+
+export interface AkaziDto {
+  id: string;
+  kind: AkaziKind;
+  title: string;
+  description: string;
+  category: { slug: string; rw: string; en: string; icon: string };
+  employment: AkaziEmployment;
+  isRemote: boolean;
+  payPeriod: AkaziPayPeriod;
+  payMin: number | null;
+  payMax: number | null;
+  status: AkaziStatus;
+  neighborhood: { slug: string; name: string; district: string };
+  images: ImageDto[];
+  poster: PublicUser;
+  viewCount: number;
+  bookmarkCount: number;
+  applicationCount: number;
+  isBookmarked: boolean;
+  /** The viewer's own application to this post, if any (null when not signed in / not applied). */
+  myApplicationStatus: AkaziApplicationStatus | null;
+  distanceKm: number | null;
+  createdAt: string;
+  bumpedAt: string;
+}
+
+export interface AkaziApplicationDto {
+  id: string;
+  akaziId: string;
+  message: string;
+  status: AkaziApplicationStatus;
+  applicant: PublicUser;
+  /** Included when the application is listed in the context of a specific post (e.g. "my applications"). */
+  akazi: Pick<AkaziDto, "id" | "kind" | "title" | "status"> | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface PostDto {
