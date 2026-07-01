@@ -16,6 +16,7 @@ import { useAkaziCategories } from "@/lib/hooks";
 import { useAuth } from "@/store/auth";
 import { api, ApiError } from "@/lib/api";
 import { Button, Chip } from "@/components/ui";
+import { PhotoPicker } from "@/components/PhotoPicker";
 import { palette, radius, spacing } from "@/theme";
 
 const EMPLOYMENT_LABEL: Record<AkaziEmployment, string> = {
@@ -50,6 +51,7 @@ export default function NewAkazi() {
   const [payPeriod, setPayPeriod] = useState<AkaziPayPeriod>("negotiable");
   const [payMin, setPayMin] = useState("");
   const [payMax, setPayMax] = useState("");
+  const [imageIds, setImageIds] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -75,6 +77,7 @@ export default function NewAkazi() {
         payPeriod,
         ...(negotiable ? {} : { payMin: num(payMin), payMax: num(payMax) || num(payMin) }),
         neighborhoodSlug: user?.neighborhood?.slug ?? "kimironko",
+        imageIds,
       });
       void qc.invalidateQueries({ queryKey: ["akazi"] });
       router.replace(`/akazi/${akazi.id}`);
@@ -99,6 +102,11 @@ export default function NewAkazi() {
         <View style={styles.segment}>
           <SegBtn label="Ndatanga serivisi" active={kind === "service"} onPress={() => setKind("service")} />
           <SegBtn label="Nshaka umukozi" active={kind === "job"} onPress={() => setKind("job")} />
+        </View>
+
+        <View style={{ gap: spacing.sm }}>
+          <Text style={styles.fieldLabel}>Amafoto (bishoboka)</Text>
+          <PhotoPicker max={6} onChange={setImageIds} />
         </View>
 
         <Field

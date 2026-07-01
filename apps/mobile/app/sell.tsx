@@ -8,6 +8,7 @@ import { CATEGORIES, type ListingDto } from "@umuturanyi/shared";
 import { useAuth } from "@/store/auth";
 import { api, ApiError } from "@/lib/api";
 import { Button, Chip } from "@/components/ui";
+import { PhotoPicker } from "@/components/PhotoPicker";
 import { palette, radius, spacing } from "@/theme";
 
 export default function Sell() {
@@ -18,6 +19,7 @@ export default function Sell() {
   const [price, setPrice] = useState("");
   const [isFree, setIsFree] = useState(false);
   const [categorySlug, setCategory] = useState(CATEGORIES[0].slug);
+  const [imageIds, setImageIds] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -33,6 +35,7 @@ export default function Sell() {
         categorySlug,
         neighborhoodSlug: user?.neighborhood?.slug ?? "kimironko",
         condition: "good",
+        imageIds,
       });
       void qc.invalidateQueries({ queryKey: ["listings"] });
       router.replace(`/isoko/${listing.id}`);
@@ -54,10 +57,7 @@ export default function Sell() {
       </View>
 
       <ScrollView contentContainerStyle={{ padding: spacing.lg, paddingBottom: 40, gap: spacing.lg }}>
-        <Pressable style={styles.photoBox}>
-          <Ionicons name="camera-outline" size={28} color={palette.textMuted} />
-          <Text style={styles.photoText}>Ongeraho amafoto</Text>
-        </Pressable>
+        <PhotoPicker max={10} onChange={setImageIds} />
 
         <Field label="Izina ry'igicuruzwa" value={title} onChangeText={setTitle} placeholder="Sofa nini y'abantu 3" />
         <Field
@@ -126,18 +126,6 @@ const styles = StyleSheet.create({
     borderBottomColor: palette.border,
   },
   headerTitle: { fontWeight: "800", fontSize: 17, color: palette.ink },
-  photoBox: {
-    height: 120,
-    borderRadius: radius.lg,
-    borderWidth: 1.5,
-    borderStyle: "dashed",
-    borderColor: palette.borderStrong,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    backgroundColor: palette.bgWarm,
-  },
-  photoText: { color: palette.textMuted, fontWeight: "600", fontSize: 13 },
   fieldLabel: { fontWeight: "600", fontSize: 13, color: palette.textSecondary },
   input: {
     minHeight: 52,

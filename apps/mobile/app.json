@@ -25,7 +25,17 @@
       "bundler": "metro",
       "output": "single"
     },
-    "plugins": ["expo-router", "expo-secure-store"],
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Umuturanyi isaba uruhushya rwo kugera ku mafoto zawe kugira ngo uzikoreshe mu bicuruzwa n'amatangazo.",
+          "cameraPermission": "Umuturanyi isaba uruhushya rwa kamera kugira ngo ufate ifoto y'igicuruzwa."
+        }
+      ]
+    ],
     "experiments": {
       "typedRoutes": false
     }

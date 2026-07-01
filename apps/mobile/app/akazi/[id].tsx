@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import type { AkaziApplicationDto } from "@umuturanyi/shared";
@@ -110,6 +111,17 @@ export default function AkaziDetail() {
           </View>
 
           <Text style={styles.title}>{a.title}</Text>
+          {a.images.length ? (
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.imageStrip}
+            >
+              {a.images.map((img) => (
+                <Image key={img.id} source={{ uri: img.url }} style={styles.image} contentFit="cover" transition={150} />
+              ))}
+            </ScrollView>
+          ) : null}
           <Text style={styles.meta}>
             {a.category.rw} · {a.neighborhood.name} · {timeAgo(a.createdAt)}
           </Text>
@@ -266,6 +278,8 @@ const styles = StyleSheet.create({
   remoteText: { color: palette.sky, fontWeight: "700", fontSize: 12 },
   closedText: { color: palette.textFaint, fontWeight: "700", fontSize: 12 },
   title: { fontWeight: "800", fontSize: 22, color: palette.ink, lineHeight: 28 },
+  imageStrip: { gap: spacing.sm, paddingTop: spacing.md },
+  image: { width: 220, height: 150, borderRadius: radius.lg, backgroundColor: palette.surfaceAlt },
   meta: { fontSize: 13, color: palette.textMuted, marginTop: 6 },
   pay: { fontWeight: "800", fontSize: 22, color: palette.ink, marginTop: spacing.md },
   description: { fontSize: 15, lineHeight: 23, color: palette.textSecondary, marginTop: spacing.lg },
